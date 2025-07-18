@@ -34,7 +34,7 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
 
     ```bash
     composer install
-    npm install && npm run dev
+    npm install && npm run build
     ```
 
 3. Configure o `.env`:
@@ -50,10 +50,10 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
     php artisan vendor:publish
     ```
 
-5. Compile os assets:
+5. (Opcional) Gere a chave:
 
     ```bash
-    npm run build
+    php artisan key:generate
     ```
 
 6. Rode o servidor:
