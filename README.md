@@ -95,12 +95,6 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
 
 ---
 
-## 📖 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
 ## 💬 Contato
 
 📧 **Seu Nome** - [leonardoaf65572005@gmail.com](mailto:leonardoaf65572005@gmail.com)  
