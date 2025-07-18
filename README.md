@@ -95,7 +95,7 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
 
 ## 💬 Contato
 
-📧 **Seu Nome** - [leonardoaf65572005@gmail.com](mailto:leonardoaf65572005@gmail.com)  
+📧 **Leonardo Alves** - [leonardoaf65572005@gmail.com](mailto:leonardoaf65572005@gmail.com)  
 🔗 [github.com/Leozinnh](https://github.com/Leozinnh)
 
 ---
