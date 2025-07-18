@@ -16,8 +16,6 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
 | Tipo          | Descrição                                                    | Demonstração                           |
 | ------------- | ------------------------------------------------------------ | -------------------------------------- |
 | **Text**      | Captcha tradicional com texto distorcido e linhas aleatórias | ![Text Captcha](docs/text.png)         |
-| **Grid**      | Selecione as imagens corretas em uma grade (tipo reCAPTCHA)  | ![Grid Captcha](docs/grid.png)         |
-| **Drag&Drop** | Arraste a peça para completar o quebra-cabeça visual         | ![DragDrop Captcha](docs/dragdrop.png) |
 | **Robot**     | Checkbox "Não sou um robô" com animações e validação AJAX    | ![Robot Captcha](docs/robot.png)       |
 | **Math**      | Resolva operações matemáticas simples para passar no desafio | ![Math Captcha](docs/math.png)         |
 
