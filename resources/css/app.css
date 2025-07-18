@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato&family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
+* {
+    font-family: "Lato", sans-serif;
+}
+
+.monospace {
+    font-family: monospace !important;
+}
+
+.leCaptcha span {
+    display: inline-block;
+    font-weight: 800;
+    color: black;
+    transition: color 0.5s ease-in-out;
+    /* background: linear-gradient(90deg, rgb(233, 1, 1), rgb(2, 212, 20), rgb(211, 211, 2), rgb(1, 76, 238)); */
+}
