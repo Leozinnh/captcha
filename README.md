@@ -52,7 +52,13 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
     php artisan vendor:publish
     ```
 
-5. Rode o servidor:
+5. Compile os assets:
+
+    ```bash
+    npm run build
+    ```
+
+6. Rode o servidor:
     ```bash
     php artisan serve
     ```
