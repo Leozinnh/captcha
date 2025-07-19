@@ -44,22 +44,46 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
     php artisan key:generate
     ```
 
-4. (Opcional) Publique os assets:
+Edite o arquivo `.env` com suas credenciais:
+
+    ```bash
+    DB_DATABASE=captcha
+    DB_USERNAME=root
+    DB_PASSWORD=sua_senha
+    ```
+
+4. **Crie o banco de dados:**
+
+    ```bash
+    create database `captcha`
+    default character set utf8
+    default collate utf8_general_ci;
+    ```
+
+5. (Opcional) Publique os assets:
 
     ```bash
     php artisan vendor:publish
     ```
 
-5. (Opcional) Gere a chave:
+6. **Execute as migrations:**
+
+    ```bash
+    php artisan migrate
+    ```
+
+7. (Opcional) Gere a chave:
 
     ```bash
     php artisan key:generate
     ```
 
-6. Rode o servidor:
+8. Rode o servidor:
     ```bash
     php artisan serve
     ```
+
+Acesse: http://localhost:8000
 
 ---
 

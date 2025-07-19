@@ -60,10 +60,21 @@
             checkboxLabel.addEventListener('click', function() {
                 if (locked) return;
 
-                hideError();
+                // hideError();
 
                 checkboxWrapper.classList.add('hidden');
                 loading.classList.remove('hidden');
+
+                const data = {
+                    token: document.querySelector('input[name="_token"]').value,
+                    ip: '{{ request()->ip() }}',
+                    userAgent: navigator.userAgent,
+                    referer: document.referrer,
+                    url: window.location.href
+                };
+
+                const jsonStr = JSON.stringify(data);
+                const encoded = btoa(jsonStr);
 
                 fetch('/captcha/validate-robot', {
                         method: 'POST',
@@ -71,7 +82,7 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({})
+                        body: JSON.stringify({payload: encoded})
                     })
                     .then(response => response.json())
                     .then(data => {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo leCaptcha com Token</title>
+</head>
+<body>
+    <h1>Exemplo de Uso do leCaptcha com Token</h1>
+    
+    <!-- Inclua o script do widget com token -->
+    <script src="http://127.0.0.1:8000/captcha-widget.js?token=SEU_TOKEN_AQUI"></script>
+
+    <!-- Adicione containers onde quiser os captchas -->
+    <div data-lecaptcha="text" data-width="400" data-height="200"></div>
+    <div data-lecaptcha="robot" data-width="350" data-height="150"></div>
+    <div data-lecaptcha="math" data-width="400" data-height="200"></div>
+
+    <!-- Escute os eventos de validação -->
+    <script>
+    document.addEventListener('leCaptchaValidated', function(event) {
+        if (event.detail.success) {
+            console.log('Captcha validado:', event.detail.message);
+            console.log('Token usado:', event.detail.token);
+            // Habilitar envio do formulário
+        } else {
+            console.log('Captcha falhou:', event.detail.message);
+        }
+    });
+    </script>
+
+    <hr>
+
+    <!-- Opção 2: iFrame Direto com Token -->
+    <iframe 
+        src="http://127.0.0.1:8000/embed/text?token=SEU_TOKEN_AQUI" 
+        width="400" 
+        height="200" 
+        frameborder="0"
+        style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    </iframe>
+</body>
+</html>
