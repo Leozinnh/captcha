@@ -37,15 +37,12 @@ O **leCaptcha** oferece 5 tipos de validação para proteger seus formulários:
     npm install && npm run build
     ```
 
-3. Configure o `.env`:
+3. Configure o `.env` com suas credenciais:
 
     ```bash
     cp .env.example .env
     php artisan key:generate
     ```
-
-Edite o arquivo `.env` com suas credenciais:
-
     ```bash
     DB_DATABASE=captcha
     DB_USERNAME=root
