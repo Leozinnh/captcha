@@ -78,4 +78,16 @@ class CaptchaToken extends Model
         
         return in_array($type, $this->allowed_types);
     }
+
+    public static function getAvailableTypes()
+    {
+        return [
+            'text' => 'Captcha de Texto',
+            'robot' => 'Captcha Robot',
+            'math' => 'Captcha Matemático',
+            'grid' => 'Captcha de Grade',
+            'dragdrop' => 'Captcha Drag & Drop',
+            'voice' => 'Captcha de Voz'
+        ];
+    }
 }

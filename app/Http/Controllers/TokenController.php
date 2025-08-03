@@ -20,7 +20,8 @@ class TokenController extends Controller
             'robot' => 'Captcha Robot',
             'math' => 'Captcha Matemático',
             'grid' => 'Captcha de Grade',
-            'dragdrop' => 'Captcha Drag & Drop'
+            'dragdrop' => 'Captcha Drag & Drop',
+            'voice' => 'Captcha de Voz'
         ];
         
         return view('tokens.create', compact('availableTypes'));
@@ -55,7 +56,8 @@ class TokenController extends Controller
             'robot' => 'Captcha Robot',
             'math' => 'Captcha Matemático',
             'grid' => 'Captcha de Grade',
-            'dragdrop' => 'Captcha Drag & Drop'
+            'dragdrop' => 'Captcha Drag & Drop',
+            'voice' => 'Captcha de Voz'
         ];
         
         return view('tokens.edit', compact('token', 'availableTypes'));

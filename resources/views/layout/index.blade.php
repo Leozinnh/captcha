@@ -9,6 +9,7 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    {{-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
 </head>
 
 <body class="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-900">
@@ -30,7 +31,7 @@
             <nav class="flex flex-col space-y-2">
                 <a href="/"
                     class="block py-3 px-5 rounded-lg font-semibold tracking-wide hover:bg-gray-700 hover:bg-opacity-50 hover:border-l-4 hover:border-blue-500 transition duration-300 ease-in-out">
-                    Tokens
+                    Dashboard
                 </a>
 
                 <a href="/admin/tokens"
@@ -61,6 +62,11 @@
                 <a href="/captcha/math"
                     class="block py-3 px-5 rounded-lg font-semibold tracking-wide hover:bg-gray-700 hover:bg-opacity-50 hover:border-l-4 hover:border-red-500 transition duration-300 ease-in-out">
                     Math Captcha
+                </a>
+
+                <a href="/captcha/voice"
+                    class="block py-3 px-5 rounded-lg font-semibold tracking-wide hover:bg-gray-700 hover:bg-opacity-50 hover:border-l-4 hover:border-orange-500 transition duration-300 ease-in-out">
+                    Voice Captcha
                 </a>
             </nav>
         </aside>

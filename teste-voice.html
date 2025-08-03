@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo Voice Captcha</title>
+</head>
+
+<body>
+    <h1>Exemplo de Voice Captcha</h1>
+
+    <!-- Método 1: Auto-inicialização -->
+    <!-- <div data-voice-captcha data-token="SEU_TOKEN_AQUI" data-base-url="http://127.0.0.1:8000">
+    </div> -->
+
+    <!-- Método 2: Inicialização manual -->
+    <div id="voice-captcha-manual"></div>
+
+    <script src="http://127.0.0.1:8000/voice-captcha.js"></script>
+    <script>
+        // Inicialização manual
+        const container = document.getElementById('voice-captcha-manual');
+        const voiceCaptcha = new VoiceCaptcha(container, {
+            token: 'SEU_TOKEN_AQUI',
+            baseUrl: 'http://127.0.0.1:8000',
+            language: 'pt-BR'
+        });
+
+        // Escutar eventos de validação
+        container.addEventListener('voiceCaptchaValidated', function (event) {
+            if (event.detail.success) {
+                console.log('Voice Captcha validado!', event.detail);
+            } else {
+                console.log('Voice Captcha falhou!', event.detail);
+            }
+        });
+    </script>
+</body>
+
+</html>

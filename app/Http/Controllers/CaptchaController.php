@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Gregwar\Captcha\CaptchaBuilder;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str; // Adicionar esta linha
 use App\Models\CaptchaToken;
 
 class CaptchaController extends Controller
@@ -356,130 +357,219 @@ class CaptchaController extends Controller
 
 
 
-    // === MÉTODOS PARA EMBEDS ===
-    public function embedText()
+    // === VOICE CAPTCHA ===
+    public function showVoice()
     {
-        return view('captcha.embed.text', ['isEmbed' => true]);
+        // Gera uma palavra aleatória de diferentes categorias
+        $challenges = [
+            'animais' => ['gato', 'cão', 'pássaro', 'peixe', 'cavalo', 'vaca', 'ovelha', 'porco', 'galinha', 'coelho'],
+            'cores' => ['azul', 'verde', 'vermelho', 'amarelo', 'roxo', 'laranja', 'rosa', 'marrom', 'cinza', 'branco'],
+            'frutas' => ['maçã', 'banana', 'laranja', 'uva', 'morango', 'abacaxi', 'manga', 'pêra', 'limão', 'melancia'],
+            'objetos' => ['mesa', 'cadeira', 'livro', 'caneta', 'telefone', 'relógio', 'chave', 'copo', 'prato', 'janela'],
+            'natureza' => ['árvore', 'flor', 'folha', 'pedra', 'água', 'fogo', 'terra', 'vento', 'chuva', 'sol'],
+            'corpo' => ['mão', 'pé', 'olho', 'boca', 'nariz', 'orelha', 'cabeça', 'braço', 'perna', 'dedo'],
+            'comidas' => ['pão', 'leite', 'queijo', 'arroz', 'feijão', 'carne', 'peixe', 'ovo', 'salada', 'sopa'],
+            'transportes' => ['carro', 'ônibus', 'trem', 'avião', 'barco', 'bicicleta', 'moto', 'caminhão', 'taxi', 'metro'],
+            'família' => ['pai', 'mãe', 'filho', 'filha', 'irmão', 'irmã', 'avô', 'avó', 'tio', 'tia'],
+            'profissões' => ['médico', 'professor', 'enfermeiro', 'policial', 'bombeiro', 'dentista', 'advogado', 'engenheiro', 'cozinheiro', 'artista']
+        ];
+        
+        $type = array_rand($challenges);
+        $challenge = $challenges[$type][array_rand($challenges[$type])];
+        
+        Session::put('voice_captcha_answer', strtolower($challenge));
+        Session::put('voice_captcha_type', $type);
+        Session::put('voice_captcha_category', $type); // Para mostrar a categoria
+        
+        return view('captcha.voice', [
+            'challenge' => $challenge,
+            'type' => $type,
+            'category' => $type
+        ]);
     }
 
-    public function embedRobot()
+    /**
+     * Gera token único para o captcha validado
+     */
+    private function generateUniqueToken($spokenText, $correctAnswer)
     {
-        return view('captcha.embed.robot', ['isEmbed' => true]);
+        $timestamp = now()->timestamp;
+        $random = Str::random(16);
+        $data = $timestamp . '-' . $random . '-' . $spokenText . '-' . $correctAnswer;
+        
+        // Gera hash único
+        return hash('sha256', $data);
     }
 
-    public function embedMath()
+    /**
+     * Normaliza texto removendo acentos e caracteres especiais
+     */
+    private function normalizeText($text)
     {
-        return view('captcha.embed.math', ['isEmbed' => true]);
+        // Remove acentos usando transliteração
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT', $text);
+        // Remove caracteres não alfabéticos (exceto espaços)
+        $text = preg_replace('/[^a-zA-Z\s]/', '', $text);
+        // Remove espaços extras e converte para minúsculas
+        $text = preg_replace('/\s+/', ' ', trim(strtolower($text)));
+        
+        return $text;
     }
 
-    public function embedGrid()
+    /**
+     * Verifica se dois textos são equivalentes considerando variações
+     */
+    private function areEquivalent($text1, $text2)
     {
-        $fontPath = public_path('fonts/captcha.ttf');
-        $correctPairs = [];
-        while (count($correctPairs) < 3) {
-            $pair = $this->randomPair();
-            if (!in_array($pair, $correctPairs)) {
-                $correctPairs[] = $pair;
+        // Normaliza ambos os textos
+        $normalized1 = $this->normalizeText($text1);
+        $normalized2 = $this->normalizeText($text2);
+        
+        // Verifica igualdade exata após normalização
+        if ($normalized1 === $normalized2) {
+            return true;
+        }
+        
+        // Verifica variações comuns de pronúncia
+        $variations = [
+            // Variações de gênero/número
+            'medico' => ['médico', 'medica', 'médica'],
+            'professor' => ['professora'],
+            'enfermeiro' => ['enfermeira'],
+            'cozinheiro' => ['cozinheira'],
+            'filho' => ['filha'],
+            'irmao' => ['irmão', 'irma', 'irmã'],
+            'avo' => ['avô', 'avó'],
+            'tio' => ['tia'],
+            
+            // Variações de acentos/pronúncia
+            'arvore' => ['árvore'],
+            'agua' => ['água'],
+            'passaro' => ['pássaro'],
+            'onibus' => ['ônibus'],
+            'aviao' => ['avião'],
+            'limao' => ['limão'],
+            'melancia' => ['melancia'],
+            'maca' => ['maçã'],
+            'pere' => ['pêra'],
+            'pe' => ['pé'],
+            'mae' => ['mãe'],
+            'irmao' => ['irmão'],
+            'irma' => ['irmã'],
+            'avo' => ['avô'],
+            'avo' => ['avó']
+        ];
+        
+        // Verifica se uma palavra tem variações conhecidas
+        foreach ($variations as $base => $vars) {
+            if ($normalized1 === $base && in_array($normalized2, array_map([$this, 'normalizeText'], $vars))) {
+                return true;
+            }
+            if ($normalized2 === $base && in_array($normalized1, array_map([$this, 'normalizeText'], $vars))) {
+                return true;
+            }
+            if (in_array($normalized1, array_map([$this, 'normalizeText'], $vars)) && 
+                in_array($normalized2, array_map([$this, 'normalizeText'], $vars))) {
+                return true;
             }
         }
+        
+        return false;
+    }
 
-        $allPairs = $correctPairs;
-        while (count($allPairs) < 9) {
-            $pair = $this->randomPair();
-            if (!in_array($pair, $allPairs)) {
-                $allPairs[] = $pair;
+    public function validateVoice(Request $request)
+    {
+        $request->validate([
+            'spoken_text' => 'required|string',
+            'captcha_token' => 'nullable|string'
+        ]);
+
+        $spokenText = strtolower(trim($request->input('spoken_text')));
+        $correctAnswer = Session::get('voice_captcha_answer');
+        $captchaToken = $request->input('captcha_token');
+        
+        // Verifica equivalência primeiro (números vs palavras)
+        if ($this->areEquivalent($spokenText, $correctAnswer)) {
+            // Gera token único se não foi fornecido
+            if (!$captchaToken) {
+                $captchaToken = $this->generateUniqueToken($spokenText, $correctAnswer);
             }
+            
+            // Salva o token na sessão para validações futuras
+            Session::put('voice_captcha_token', $captchaToken);
+            Session::put('voice_captcha_validated_at', now());
+            
+            // Remove os dados do captcha da sessão
+            Session::forget(['voice_captcha_answer', 'voice_captcha_type']);
+            
+            return back()->with([
+                'success' => '🎉 Captcha de voz validado com sucesso!',
+                'token' => $captchaToken
+            ]);
         }
-
-        shuffle($allPairs);
-        Session::put('captcha_grid_sequence', $correctPairs);
-
-        $images = [];
-        foreach ($allPairs as $pair) {
-            $images[] = $this->generateImageForText($pair, $fontPath);
+        
+        // Se não são equivalentes, tenta normalização e similaridade
+        $spokenTextNormalized = $this->normalizeText($spokenText);
+        $correctAnswerNormalized = $this->normalizeText($correctAnswer);
+        
+        // Verifica se as palavras são similares (permite pequenas variações)
+        $similarity = 0;
+        similar_text($spokenTextNormalized, $correctAnswerNormalized, $similarity);
+        
+        if ($similarity >= 70 || $spokenTextNormalized === $correctAnswerNormalized) {
+            // Gera token único se não foi fornecido
+            if (!$captchaToken) {
+                $captchaToken = $this->generateUniqueToken($spokenText, $correctAnswer);
+            }
+            
+            // Salva o token na sessão para validações futuras
+            Session::put('voice_captcha_token', $captchaToken);
+            Session::put('voice_captcha_validated_at', now());
+            
+            // Remove os dados do captcha da sessão
+            Session::forget(['voice_captcha_answer', 'voice_captcha_type']);
+            
+            return back()->with([
+                'success' => '🎉 Captcha de voz validado com sucesso!',
+                'token' => $captchaToken
+            ]);
         }
+        
+        return back()->with('error', '❌ Não foi possível validar sua fala. Tente novamente.');
+    }
 
-        return view('captcha.embed.grid', [
-            'images' => $images,
-            'pairs' => $allPairs,
+    // Método para embed de voz
+    public function embedVoice()
+    {
+        $challenges = [
+            'animais' => ['gato', 'cão', 'pássaro', 'peixe', 'cavalo', 'vaca', 'ovelha', 'porco', 'galinha', 'coelho'],
+            'cores' => ['azul', 'verde', 'vermelho', 'amarelo', 'roxo', 'laranja', 'rosa', 'marrom', 'cinza', 'branco'],
+            'frutas' => ['maçã', 'banana', 'laranja', 'uva', 'morango', 'abacaxi', 'manga', 'pêra', 'limão', 'melancia'],
+            'objetos' => ['mesa', 'cadeira', 'livro', 'caneta', 'telefone', 'relógio', 'chave', 'copo', 'prato', 'janela'],
+            'natureza' => ['árvore', 'flor', 'folha', 'pedra', 'água', 'fogo', 'terra', 'vento', 'chuva', 'sol'],
+            'corpo' => ['mão', 'pé', 'olho', 'boca', 'nariz', 'orelha', 'cabeça', 'braço', 'perna', 'dedo'],
+            'comidas' => ['pão', 'leite', 'queijo', 'arroz', 'feijão', 'carne', 'peixe', 'ovo', 'salada', 'sopa'],
+            'transportes' => ['carro', 'ônibus', 'trem', 'avião', 'barco', 'bicicleta', 'moto', 'caminhão', 'taxi', 'metro'],
+            'família' => ['pai', 'mãe', 'filho', 'filha', 'irmão', 'irmã', 'avô', 'avó', 'tio', 'tia'],
+            'profissões' => ['médico', 'professor', 'enfermeiro', 'policial', 'bombeiro', 'dentista', 'advogado', 'engenheiro', 'cozinheiro', 'artista']
+        ];
+        
+        $type = array_rand($challenges);
+        $challenge = $challenges[$type][array_rand($challenges[$type])];
+        
+        Session::put('voice_captcha_answer', strtolower($challenge));
+        Session::put('voice_captcha_type', $type);
+        Session::put('voice_captcha_category', $type);
+        
+        return view('captcha.embed.voice', [
+            'challenge' => $challenge,
+            'type' => $type,
+            'category' => $type,
             'isEmbed' => true
         ]);
     }
 
-    public function embedDragDrop()
-    {
-        $bgPath = public_path('images/bg.jpg');
-        if (!file_exists($bgPath)) {
-            throw new \Exception('Imagem de fundo não encontrada: ' . $bgPath);
-        }
-
-        $captchaPath = public_path('captcha');
-        if (!is_dir($captchaPath)) {
-            mkdir($captchaPath, 0755, true);
-        }
-
-        $bg = imagecreatefromjpeg($bgPath);
-        $width = 250;
-        $height = 250;
-        $slotSize = 50;
-        $slotX = rand(60, $width - $slotSize - 60);
-        $slotY = rand(60, $height - $slotSize - 60);
-
-        $piece = imagecreatetruecolor($slotSize, $slotSize);
-        imagecopy($piece, $bg, 0, 0, $slotX, $slotY, $slotSize, $slotSize);
-
-        $grey = imagecolorallocatealpha($bg, 200, 200, 200, 60);
-        imagefilledrectangle($bg, $slotX, $slotY, $slotX + $slotSize, $slotY + $slotSize, $grey);
-
-        $bgPathOut = $captchaPath . '/puzzle_base.png';
-        $piecePathOut = $captchaPath . '/puzzle_piece.png';
-
-        imagepng($bg, $bgPathOut);
-        imagepng($piece, $piecePathOut);
-        imagedestroy($bg);
-        imagedestroy($piece);
-
-        session([
-            'puzzle_x' => $slotX,
-            'puzzle_y' => $slotY,
-            'slot_size' => $slotSize,
-            'bg_width' => $width,
-            'bg_height' => $height,
-        ]);
-
-        return view('captcha.embed.dragdrop', ['isEmbed' => true]);
-    }
-
-    // Middleware para validar token
-    private function validateToken(Request $request, $captchaType)
-    {
-        $token = $request->header('X-Captcha-Token') ?: $request->input('token');
-        
-        if (!$token) {
-            return response()->json(['error' => 'Token requerido'], 401);
-        }
-
-        $captchaToken = CaptchaToken::where('token', $token)->where('is_active', true)->first();
-        
-        if (!$captchaToken) {
-            return response()->json(['error' => 'Token inválido'], 401);
-        }
-
-        if ($captchaToken->hasReachedDailyLimit()) {
-            return response()->json(['error' => 'Limite diário excedido'], 429);
-        }
-
-        if (!$captchaToken->canUseCaptchaType($captchaType)) {
-            return response()->json(['error' => 'Tipo de captcha não permitido'], 403);
-        }
-
-        // Incrementa contador de uso
-        $captchaToken->incrementUsage();
-        
-        return $captchaToken;
-    }
-
-    // Atualizar método validateEmbed
+    // Atualizar método validateEmbed para incluir voice
     public function validateEmbed(Request $request, $type)
     {
         // Validar token
@@ -536,6 +626,28 @@ class CaptchaController extends Controller
 
                 $result = abs($posXReal - $puzzleX) <= $toleranceX && abs($posYReal - $puzzleY) <= $toleranceY;
                 $message = $result ? '✅ Captcha validado com sucesso!' : '❌ Captcha inválido, tente novamente.';
+                break;
+
+            case 'voice':
+                $request->validate(['spoken_text' => 'required|string']);
+                $spokenText = strtolower(trim($request->input('spoken_text')));
+                $correctAnswer = strtolower(trim(Session::get('voice_captcha_answer')));
+                
+                // Verifica equivalência primeiro (números vs palavras)
+                if ($this->areEquivalent($spokenText, $correctAnswer)) {
+                    $result = true;
+                    $message = '✅ Captcha de voz validado!';
+                } else {
+                    // Tenta normalização e similaridade
+                    $spokenTextNormalized = $this->normalizeText($spokenText);
+                    $correctAnswerNormalized = $this->normalizeText($correctAnswer);
+                    
+                    $similarity = 0;
+                    similar_text($spokenTextNormalized, $correctAnswerNormalized, $similarity);
+                    
+                    $result = $similarity >= 80 || $spokenTextNormalized === $correctAnswerNormalized;
+                    $message = $result ? '✅ Captcha de voz validado!' : '❌ Não foi possível validar sua fala.';
+                }
                 break;
         }
 
