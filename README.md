@@ -11,7 +11,7 @@ Um sistema de **CAPTCHA moderno e elegante** com múltiplos desafios para valida
 
 ## 🚀 Recursos disponíveis
 
-O **leCaptcha** oferece 6 tipos de validação para proteger seus formulários:
+O **leCaptcha** oferece 7 tipos de validação para proteger seus formulários:
 
 | Tipo          | Descrição                                                      | Demonstração                           |
 | ------------- | -------------------------------------------------------------- | -------------------------------------- |
