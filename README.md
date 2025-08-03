@@ -292,11 +292,10 @@ $max_attempts = 5; // Padrão: ilimitado
 
 ## 📸 Screenshots
 
-| ![Dashboard](docs/dashboard.png)    | ![Voice Captcha](docs/voice.png)     |
 | ----------------------------------- | ------------------------------------- |
-| ![Text Captcha](docs/text.png)     | ![Grid Captcha](docs/grid.png)       |
-| ![DragDrop](docs/dragdrop.png)     | ![Robot Captcha](docs/robot.png)     |
-| ![Math Captcha](docs/math.png)     |                                      |
+| ![Text Captcha](docs/text.png)      | ![Grid Captcha](docs/grid.png)        |
+| ![DragDrop](docs/dragdrop.png)      | ![Robot Captcha](docs/robot.png)      |
+| ![Math Captcha](docs/math.png)      |                                       |
 
 ---
 
