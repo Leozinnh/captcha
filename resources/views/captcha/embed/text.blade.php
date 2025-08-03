@@ -1,4 +1,3 @@
-<?php
 @extends('captcha.embed.layout')
 
 @section('content')

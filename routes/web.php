@@ -37,6 +37,10 @@ Route::prefix('captcha')->group(function () {
     // Voice Captcha
     Route::get('/voice', [CaptchaController::class, 'showVoice'])->name('captcha.voice');
     Route::post('/validate-voice', [CaptchaController::class, 'validateVoice'])->name('captcha.voice.validate');
+
+    // Logic Captcha
+    Route::get('/logic', [CaptchaController::class, 'showLogic'])->name('captcha.logic');
+    Route::post('/logic/validate', [CaptchaController::class, 'validateLogic'])->name('captcha.logic.validate');
 });
 
 // Rotas para embeds com autenticação por token
@@ -47,10 +51,14 @@ Route::prefix('embed')->middleware(ValidateCaptchaToken::class)->group(function 
     Route::get('/grid', [CaptchaController::class, 'embedGrid'])->name('embed.grid');
     Route::get('/dragdrop', [CaptchaController::class, 'embedDragDrop'])->name('embed.dragdrop');
     Route::get('/voice', [CaptchaController::class, 'embedVoice'])->name('embed.voice');
+    Route::get('/logic', [CaptchaController::class, 'embedLogic'])->name('embed.logic');
 
-    // API para validação cross-origin
+    // API para validação cross-origin - ATUALIZADO O NOME DO MÉTODO
     Route::post('/validate/{type}', [CaptchaController::class, 'validateEmbed'])->name('embed.validate');
 });
+
+// Rota genérica para validação de captchas - NOVO NOME DO MÉTODO
+Route::post('/captcha/validate', [CaptchaController::class, 'validateCaptcha'])->name('captcha.validate');
 
 // Rota para gerar script de incorporação (sem middleware, mas precisa de token via query)
 Route::get('/captcha-widget.js', [CaptchaController::class, 'generateWidget'])->name('widget.js');

@@ -112,6 +112,7 @@ O **leCaptcha** oferece 6 tipos de validação para proteger seus formulários:
 | `/captcha/robot`    | GET  | Checkbox "Não sou um robô"         |
 | `/captcha/math`     | GET  | Captcha matemático                 |
 | `/captcha/voice`    | GET  | **Captcha de voz** 🆕              |
+| `/captcha/logic`    | GET  | **Captcha de logica** 🆕              |
 
 ### 🔗 **Rotas embed** (para integração)
 | Rota                      | Tipo | Descrição                    |
@@ -122,6 +123,7 @@ O **leCaptcha** oferece 6 tipos de validação para proteger seus formulários:
 | `/embed/robot`            | GET  | Embed do captcha robot       |
 | `/embed/math`             | GET  | Embed do captcha matemático  |
 | `/embed/voice`            | GET  | **Embed do captcha de voz**  |
+| `/embed/logic`            | GET  | **Embed do captcha de logica**  |
 
 ### 🔧 **Rotas de validação**
 | Rota                           | Tipo | Descrição                    |
@@ -132,6 +134,7 @@ O **leCaptcha** oferece 6 tipos de validação para proteger seus formulários:
 | `/captcha/robot/validate`      | POST | Valida captcha robot         |
 | `/captcha/math/validate`       | POST | Valida captcha matemático    |
 | `/captcha/voice/validate`      | POST | **Valida captcha de voz**    |
+| `/captcha/logic/validate`      | POST | **Valida captcha de logica**    |
 | `/captcha/validate`            | POST | Validação embed (genérica)   |
 
 ---
@@ -210,6 +213,7 @@ leCaptcha/
 │   └── views/
 │       ├── captcha/                 # Views dos captchas
 │       │   ├── voice.blade.php      # 🆕 Voice Captcha
+│       │   ├── logic.blade.php      # 🆕 Logic Captcha
 │       │   ├── text.blade.php
 │       │   ├── grid.blade.php
 │       │   ├── dragdrop.blade.php

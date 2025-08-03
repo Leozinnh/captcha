@@ -373,14 +373,14 @@ class CaptchaController extends Controller
             'família' => ['pai', 'mãe', 'filho', 'filha', 'irmão', 'irmã', 'avô', 'avó', 'tio', 'tia'],
             'profissões' => ['médico', 'professor', 'enfermeiro', 'policial', 'bombeiro', 'dentista', 'advogado', 'engenheiro', 'cozinheiro', 'artista']
         ];
-        
+
         $type = array_rand($challenges);
         $challenge = $challenges[$type][array_rand($challenges[$type])];
-        
+
         Session::put('voice_captcha_answer', strtolower($challenge));
         Session::put('voice_captcha_type', $type);
         Session::put('voice_captcha_category', $type); // Para mostrar a categoria
-        
+
         return view('captcha.voice', [
             'challenge' => $challenge,
             'type' => $type,
@@ -396,7 +396,7 @@ class CaptchaController extends Controller
         $timestamp = now()->timestamp;
         $random = Str::random(16);
         $data = $timestamp . '-' . $random . '-' . $spokenText . '-' . $correctAnswer;
-        
+
         // Gera hash único
         return hash('sha256', $data);
     }
@@ -412,7 +412,7 @@ class CaptchaController extends Controller
         $text = preg_replace('/[^a-zA-Z\s]/', '', $text);
         // Remove espaços extras e converte para minúsculas
         $text = preg_replace('/\s+/', ' ', trim(strtolower($text)));
-        
+
         return $text;
     }
 
@@ -424,12 +424,12 @@ class CaptchaController extends Controller
         // Normaliza ambos os textos
         $normalized1 = $this->normalizeText($text1);
         $normalized2 = $this->normalizeText($text2);
-        
+
         // Verifica igualdade exata após normalização
         if ($normalized1 === $normalized2) {
             return true;
         }
-        
+
         // Verifica variações comuns de pronúncia
         $variations = [
             // Variações de gênero/número
@@ -441,7 +441,7 @@ class CaptchaController extends Controller
             'irmao' => ['irmão', 'irma', 'irmã'],
             'avo' => ['avô', 'avó'],
             'tio' => ['tia'],
-            
+
             // Variações de acentos/pronúncia
             'arvore' => ['árvore'],
             'agua' => ['água'],
@@ -459,7 +459,7 @@ class CaptchaController extends Controller
             'avo' => ['avô'],
             'avo' => ['avó']
         ];
-        
+
         // Verifica se uma palavra tem variações conhecidas
         foreach ($variations as $base => $vars) {
             if ($normalized1 === $base && in_array($normalized2, array_map([$this, 'normalizeText'], $vars))) {
@@ -468,12 +468,14 @@ class CaptchaController extends Controller
             if ($normalized2 === $base && in_array($normalized1, array_map([$this, 'normalizeText'], $vars))) {
                 return true;
             }
-            if (in_array($normalized1, array_map([$this, 'normalizeText'], $vars)) && 
-                in_array($normalized2, array_map([$this, 'normalizeText'], $vars))) {
+            if (
+                in_array($normalized1, array_map([$this, 'normalizeText'], $vars)) &&
+                in_array($normalized2, array_map([$this, 'normalizeText'], $vars))
+            ) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -487,54 +489,54 @@ class CaptchaController extends Controller
         $spokenText = strtolower(trim($request->input('spoken_text')));
         $correctAnswer = Session::get('voice_captcha_answer');
         $captchaToken = $request->input('captcha_token');
-        
+
         // Verifica equivalência primeiro (números vs palavras)
         if ($this->areEquivalent($spokenText, $correctAnswer)) {
             // Gera token único se não foi fornecido
             if (!$captchaToken) {
                 $captchaToken = $this->generateUniqueToken($spokenText, $correctAnswer);
             }
-            
+
             // Salva o token na sessão para validações futuras
             Session::put('voice_captcha_token', $captchaToken);
             Session::put('voice_captcha_validated_at', now());
-            
+
             // Remove os dados do captcha da sessão
             Session::forget(['voice_captcha_answer', 'voice_captcha_type']);
-            
+
             return back()->with([
                 'success' => '🎉 Captcha de voz validado com sucesso!',
                 'token' => $captchaToken
             ]);
         }
-        
+
         // Se não são equivalentes, tenta normalização e similaridade
         $spokenTextNormalized = $this->normalizeText($spokenText);
         $correctAnswerNormalized = $this->normalizeText($correctAnswer);
-        
+
         // Verifica se as palavras são similares (permite pequenas variações)
         $similarity = 0;
         similar_text($spokenTextNormalized, $correctAnswerNormalized, $similarity);
-        
+
         if ($similarity >= 70 || $spokenTextNormalized === $correctAnswerNormalized) {
             // Gera token único se não foi fornecido
             if (!$captchaToken) {
                 $captchaToken = $this->generateUniqueToken($spokenText, $correctAnswer);
             }
-            
+
             // Salva o token na sessão para validações futuras
             Session::put('voice_captcha_token', $captchaToken);
             Session::put('voice_captcha_validated_at', now());
-            
+
             // Remove os dados do captcha da sessão
             Session::forget(['voice_captcha_answer', 'voice_captcha_type']);
-            
+
             return back()->with([
                 'success' => '🎉 Captcha de voz validado com sucesso!',
                 'token' => $captchaToken
             ]);
         }
-        
+
         return back()->with('error', '❌ Não foi possível validar sua fala. Tente novamente.');
     }
 
@@ -553,14 +555,14 @@ class CaptchaController extends Controller
             'família' => ['pai', 'mãe', 'filho', 'filha', 'irmão', 'irmã', 'avô', 'avó', 'tio', 'tia'],
             'profissões' => ['médico', 'professor', 'enfermeiro', 'policial', 'bombeiro', 'dentista', 'advogado', 'engenheiro', 'cozinheiro', 'artista']
         ];
-        
+
         $type = array_rand($challenges);
         $challenge = $challenges[$type][array_rand($challenges[$type])];
-        
+
         Session::put('voice_captcha_answer', strtolower($challenge));
         Session::put('voice_captcha_type', $type);
         Session::put('voice_captcha_category', $type);
-        
+
         return view('captcha.embed.voice', [
             'challenge' => $challenge,
             'type' => $type,
@@ -569,7 +571,233 @@ class CaptchaController extends Controller
         ]);
     }
 
-    // Atualizar método validateEmbed para incluir voice
+    // RENOMEADO: validate() -> validateCaptcha()
+    public function validateCaptcha(Request $request)
+    {
+        $type = $request->input('type');
+        $result = false;
+        $message = '';
+
+        switch ($type) {
+            case 'logic':
+                $request->validate(['answer' => 'required|string']);
+                $userAnswer = trim($request->input('answer'));
+                $correctAnswer = Session::get('logic_captcha_correct');
+
+                $result = $userAnswer === $correctAnswer;
+                $message = $result ? '🎯 Captcha lógico validado!' : '❌ Resposta incorreta.';
+                break;
+
+            case 'text':
+                $request->validate(['captcha' => 'required|string']);
+                $result = strtoupper($request->captcha) === strtoupper(session('captcha_code'));
+                $message = $result ? '✅ Captcha válido!' : '❌ Captcha inválido.';
+                break;
+
+            case 'math':
+                $correct = Session::get('captcha_math_result');
+                $result = $request->input('answer') == $correct;
+                $message = $result ? 'Resposta correta!' : 'Resposta errada, tente novamente.';
+                break;
+
+            case 'voice':
+                $request->validate(['spoken_text' => 'required|string']);
+                $spokenText = strtolower(trim($request->input('spoken_text')));
+                $correctAnswer = strtolower(trim(Session::get('voice_captcha_answer')));
+
+                if ($this->areEquivalent($spokenText, $correctAnswer)) {
+                    $result = true;
+                    $message = '✅ Captcha de voz validado!';
+                } else {
+                    $spokenTextNormalized = $this->normalizeText($spokenText);
+                    $correctAnswerNormalized = $this->normalizeText($correctAnswer);
+
+                    $similarity = 0;
+                    similar_text($spokenTextNormalized, $correctAnswerNormalized, $similarity);
+
+                    $result = $similarity >= 80 || $spokenTextNormalized === $correctAnswerNormalized;
+                    $message = $result ? '✅ Captcha de voz validado!' : '❌ Não foi possível validar sua fala.';
+                }
+                break;
+
+            case 'robot':
+                sleep(2);
+                $result = true;
+                $message = '✅ Captcha validado com sucesso!';
+                break;
+
+            case 'grid':
+                $selected = $request->input('selected', []);
+                $correct = Session::get('captcha_grid_sequence', []);
+                $result = $selected === $correct;
+                $message = $result ? '✅ Captcha válido!' : '❌ Captcha inválido.';
+                break;
+
+            case 'dragdrop':
+                $posX = (float) $request->input('posX');
+                $posY = (float) $request->input('posY');
+                $puzzleX = session('puzzle_x');
+                $puzzleY = session('puzzle_y');
+                $bgWidth = session('bg_width');
+                $bgHeight = session('bg_height');
+
+                $displayWidth = 300;
+                $displayHeight = $bgHeight * ($displayWidth / $bgWidth);
+                $scaleX = $bgWidth / $displayWidth;
+                $scaleY = $bgHeight / $displayHeight;
+                $posXReal = $posX * $scaleX;
+                $posYReal = $posY * $scaleY;
+                $toleranceX = 30;
+                $toleranceY = 25;
+
+                $result = abs($posXReal - $puzzleX) <= $toleranceX && abs($posYReal - $puzzleY) <= $toleranceY;
+                $message = $result ? '✅ Captcha validado com sucesso!' : '❌ Captcha inválido, tente novamente.';
+                break;
+
+            default:
+                $result = false;
+                $message = 'Tipo de captcha não suportado.';
+                break;
+        }
+
+        return response()->json([
+            'success' => $result,
+            'message' => $message
+        ]);
+    }
+
+    // Método privado para validar tokens de embed
+    private function validateToken(Request $request, $captchaType)
+    {
+        $token = $request->header('X-Captcha-Token') ?: $request->input('token');
+        
+        if (!$token) {
+            return response()->json(['error' => 'Token requerido'], 401);
+        }
+
+        $captchaToken = CaptchaToken::where('token', $token)->where('is_active', true)->first();
+        
+        if (!$captchaToken) {
+            return response()->json(['error' => 'Token inválido'], 401);
+        }
+
+        if ($captchaToken->hasReachedDailyLimit()) {
+            return response()->json(['error' => 'Limite diário excedido'], 429);
+        }
+
+        if (!$captchaToken->canUseCaptchaType($captchaType)) {
+            return response()->json(['error' => 'Tipo de captcha não permitido'], 403);
+        }
+
+        // Incrementa contador de uso
+        $captchaToken->incrementUsage();
+        
+        return $captchaToken;
+    }
+
+    // === LOGIC CAPTCHA ===
+    public function showLogic()
+    {
+        // Banco de perguntas lógicas simples
+        $questions = [
+            [
+                'question' => 'Qual é maior: 🐘 ou 🐭?',
+                'options' => ['🐘 Elefante', '🐭 Rato'],
+                'correct' => '🐘 Elefante',
+                'category' => 'size'
+            ],
+            [
+                'question' => 'Quantas pernas tem um gato?',
+                'options' => ['2', '4', '6', '8'],
+                'correct' => '4',
+                'category' => 'count'
+            ],
+            [
+                'question' => 'Que cor você obtém misturando azul + amarelo?',
+                'options' => ['🟢 Verde', '🟣 Roxo', '🟠 Laranja', '🔴 Vermelho'],
+                'correct' => '🟢 Verde',
+                'category' => 'color'
+            ],
+            [
+                'question' => 'O que vem depois de segunda-feira?',
+                'options' => ['Domingo', 'Terça-feira', 'Sexta-feira', 'Sábado'],
+                'correct' => 'Terça-feira',
+                'category' => 'logic'
+            ],
+            [
+                'question' => 'Quanto é 2 + 2?',
+                'options' => ['3', '4', '5', '6'],
+                'correct' => '4',
+                'category' => 'math'
+            ],
+            [
+                'question' => 'Qual é o oposto de quente?',
+                'options' => ['🔥 Fogo', '❄️ Frio', '🌞 Sol', '💧 Água'],
+                'correct' => '❄️ Frio',
+                'category' => 'opposite'
+            ],
+            [
+                'question' => 'Qual animal voa?',
+                'options' => ['🐕 Cachorro', '🐦 Pássaro', '🐠 Peixe', '🐸 Sapo'],
+                'correct' => '🐦 Pássaro',
+                'category' => 'animal'
+            ],
+            [
+                'question' => 'Onde vivem os peixes?',
+                'options' => ['🌲 Árvore', '🏠 Casa', '💧 Água', '☁️ Nuvem'],
+                'correct' => '💧 Água',
+                'category' => 'habitat'
+            ],
+            [
+                'question' => 'Quantos dedos tem uma mão?',
+                'options' => ['3', '4', '5', '6'],
+                'correct' => '5',
+                'category' => 'body'
+            ],
+            [
+                'question' => 'O que usamos para ver?',
+                'options' => ['👂 Orelha', '👀 Olhos', '👃 Nariz', '👄 Boca'],
+                'correct' => '👀 Olhos',
+                'category' => 'body'
+            ]
+        ];
+
+        // Seleciona uma pergunta aleatória
+        $selectedQuestion = $questions[array_rand($questions)];
+        
+        // Embaralha as opções para deixar mais difícil
+        $options = $selectedQuestion['options'];
+        shuffle($options);
+
+        // Salva a resposta correta na sessão
+        Session::put('logic_captcha_question', $selectedQuestion['question']);
+        Session::put('logic_captcha_correct', $selectedQuestion['correct']);
+        Session::put('logic_captcha_category', $selectedQuestion['category']);
+
+        return view('captcha.logic', [
+            'question' => $selectedQuestion['question'],
+            'options' => $options,
+            'category' => $selectedQuestion['category']
+        ]);
+    }
+
+    public function validateLogic(Request $request)
+    {
+        $request->validate([
+            'answer' => 'required|string'
+        ]);
+
+        $userAnswer = trim($request->input('answer'));
+        $correctAnswer = Session::get('logic_captcha_correct');
+        $category = Session::get('logic_captcha_category');
+
+        if ($userAnswer === $correctAnswer) {
+            return back()->with('success', '🎯 Excelente! Captcha lógico validado com sucesso!');
+        }
+
+        return back()->with('error', '❌ Resposta incorreta. Tente novamente.');
+    }
+
     public function validateEmbed(Request $request, $type)
     {
         // Validar token
@@ -582,6 +810,15 @@ class CaptchaController extends Controller
         $message = '';
 
         switch ($type) {
+            case 'logic':
+                $request->validate(['answer' => 'required|string']);
+                $userAnswer = trim($request->input('answer'));
+                $correctAnswer = Session::get('logic_captcha_correct');
+
+                $result = $userAnswer === $correctAnswer;
+                $message = $result ? '🎯 Captcha lógico validado!' : '❌ Resposta incorreta.';
+                break;
+
             case 'text':
                 $request->validate(['captcha' => 'required|string']);
                 $result = strtoupper($request->captcha) === strtoupper(session('captcha_code'));
@@ -630,137 +867,20 @@ class CaptchaController extends Controller
 
             case 'voice':
                 $request->validate(['spoken_text' => 'required|string']);
-                $spokenText = strtolower(trim($request->input('spoken_text')));
-                $correctAnswer = strtolower(trim(Session::get('voice_captcha_answer')));
+                $spokenText = $this->normalizeText($request->input('spoken_text'));
+                $correctAnswer = $this->normalizeText(Session::get('voice_captcha_answer'));
                 
-                // Verifica equivalência primeiro (números vs palavras)
-                if ($this->areEquivalent($spokenText, $correctAnswer)) {
-                    $result = true;
-                    $message = '✅ Captcha de voz validado!';
-                } else {
-                    // Tenta normalização e similaridade
-                    $spokenTextNormalized = $this->normalizeText($spokenText);
-                    $correctAnswerNormalized = $this->normalizeText($correctAnswer);
-                    
-                    $similarity = 0;
-                    similar_text($spokenTextNormalized, $correctAnswerNormalized, $similarity);
-                    
-                    $result = $similarity >= 80 || $spokenTextNormalized === $correctAnswerNormalized;
-                    $message = $result ? '✅ Captcha de voz validado!' : '❌ Não foi possível validar sua fala.';
-                }
+                $similarity = 0;
+                similar_text($spokenText, $correctAnswer, $similarity);
+                
+                $result = $similarity >= 80 || $spokenText === $correctAnswer;
+                $message = $result ? '✅ Captcha de voz validado!' : '❌ Não foi possível validar sua fala.';
                 break;
         }
 
         return response()->json([
             'success' => $result,
             'message' => $message
-        ]);
-    }
-
-    public function generateWidget(Request $request)
-    {
-        $token = $request->get('token');
-
-        if (!$token) {
-            return response('console.error("leCaptcha: Token obrigatório");', 200)
-                ->header('Content-Type', 'application/javascript');
-        }
-
-        $baseUrl = request()->getSchemeAndHttpHost();
-
-        $js = "
-(function() {
-    const LECAPTCHA_TOKEN = '{$token}';
-    const BASE_URL = '{$baseUrl}';
-    
-    function loadLeCaptcha() {
-        const containers = document.querySelectorAll('[data-lecaptcha]');
-        
-        containers.forEach(container => {
-            const type = container.getAttribute('data-lecaptcha');
-            const width = container.getAttribute('data-width') || '400';
-            const height = container.getAttribute('data-height') || '300';
-            
-            const iframe = document.createElement('iframe');
-            iframe.src = BASE_URL + '/embed/' + type + '?token=' + LECAPTCHA_TOKEN;
-            iframe.width = width;
-            iframe.height = height;
-            iframe.style.border = 'none';
-            iframe.style.borderRadius = '8px';
-            iframe.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-            
-            container.appendChild(iframe);
-            
-            // Listener para mensagens do iframe
-            window.addEventListener('message', function(event) {
-                if (event.origin !== BASE_URL) return;
-                
-                if (event.data.type === 'captcha_validated') {
-                    const customEvent = new CustomEvent('leCaptchaValidated', {
-                        detail: {
-                            success: event.data.success,
-                            message: event.data.message,
-                            captchaType: type,
-                            token: LECAPTCHA_TOKEN
-                        }
-                    });
-                    container.dispatchEvent(customEvent);
-                }
-            });
-        });
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadLeCaptcha);
-    } else {
-        loadLeCaptcha();
-    }
-})();
-        ";
-
-        return response($js)->header('Content-Type', 'application/javascript');
-    }
-
-    // Métodos para gerenciar tokens
-    public function listTokens()
-    {
-        $tokens = CaptchaToken::orderBy('created_at', 'desc')->get();
-        return view('admin.tokens.index', compact('tokens'));
-    }
-
-    public function createToken(Request $request)
-    {
-        $request->validate([
-            'domain' => 'required|string',
-            'name' => 'nullable|string|max:255',
-            'daily_limit' => 'integer|min:1',
-            'allowed_types' => 'nullable|array',
-            'allowed_types.*' => 'in:text,robot,math,grid,dragdrop'
-        ]);
-
-        $token = CaptchaToken::create([
-            'token' => CaptchaToken::generateToken(),
-            'domain' => $request->domain,
-            'name' => $request->name,
-            'daily_limit' => $request->daily_limit ?? 1000,
-            'allowed_types' => $request->allowed_types
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'message' => 'Token criado com sucesso'
-        ]);
-    }
-
-    public function deleteToken($id)
-    {
-        $token = CaptchaToken::findOrFail($id);
-        $token->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Token excluído com sucesso'
         ]);
     }
 }

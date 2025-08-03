@@ -68,6 +68,11 @@
                     class="block py-3 px-5 rounded-lg font-semibold tracking-wide hover:bg-gray-700 hover:bg-opacity-50 hover:border-l-4 hover:border-orange-500 transition duration-300 ease-in-out">
                     Voice Captcha
                 </a>
+
+                <a href="/captcha/logic"
+                    class="block py-3 px-5 rounded-lg font-semibold tracking-wide hover:bg-gray-700 hover:bg-opacity-50 hover:border-l-4 hover:border-purple-500 transition duration-300 ease-in-out">
+                    Logic Captcha
+                </a>
             </nav>
         </aside>
 
