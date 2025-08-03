@@ -292,10 +292,9 @@ $max_attempts = 5; // Padrão: ilimitado
 
 ## 📸 Screenshots
 
-| ----------------------------------- | ------------------------------------- |
-| ![Text Captcha](docs/text.png)      | ![Grid Captcha](docs/grid.png)        |
-| ![DragDrop](docs/dragdrop.png)      | ![Robot Captcha](docs/robot.png)      |
-| ![Math Captcha](docs/math.png)      |                                       |
+| ![Text Captcha](docs/text.png)         | ![Grid Captcha](docs/grid.png)   |
+| -------------------------------------- | -------------------------------- |
+| ![DragDrop Captcha](docs/dragdrop.png) | ![Robot Captcha](docs/robot.png) |
 
 ---
 
@@ -336,5 +335,5 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 
 <div align="center">
   <p>⭐ Se este projeto te ajudou, considere dar uma estrela!</p>
-  <p>🤖 <strong>leCaptcha</strong> - Protegendo aplicações com estilo desde 2024</p>
+  <p>🤖 <strong>leCaptcha</strong> - Protegendo aplicações com estilo desde 2025</p>
 </div>
